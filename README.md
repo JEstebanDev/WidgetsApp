@@ -1,3 +1,3 @@
-# widget_app
+# WidgetApp
 
-WidgetApp to learn more about widgets
+WidgetApp to learn more about widgets, routing, and Material 3 
