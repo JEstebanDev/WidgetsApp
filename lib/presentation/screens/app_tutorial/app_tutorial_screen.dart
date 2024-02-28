@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -15,10 +16,37 @@ final slides = <SlideInfo>[
   SlideInfo("Disfruta la comida", "caption", "assets/images/3.png")
 ];
 
-class AppTutorialScreen extends StatelessWidget {
+class AppTutorialScreen extends StatefulWidget {
   const AppTutorialScreen({super.key});
 
   static const String name = "app_tutorial_screen";
+
+  @override
+  State<AppTutorialScreen> createState() => _AppTutorialScreenState();
+}
+
+class _AppTutorialScreenState extends State<AppTutorialScreen> {
+  final PageController pageViewController = PageController();
+  bool endReached = false;
+  double lastSlide = slides.length - 1.5;
+  @override
+  void initState() {
+    super.initState();
+    pageViewController.addListener(() {
+      final page = pageViewController.page ?? 0;
+      if (!endReached && page >= lastSlide) {
+        setState(() {
+          endReached = true;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    pageViewController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +55,7 @@ class AppTutorialScreen extends StatelessWidget {
       body: Stack(
         children: [
           PageView(
+              controller: pageViewController,
               physics: const BouncingScrollPhysics(),
               children: slides
                   .map((slideItem) => _Slide(
@@ -36,12 +65,25 @@ class AppTutorialScreen extends StatelessWidget {
                       ))
                   .toList()),
           Positioned(
-            right: 20,
+              right: 20,
               top: 50,
               child: TextButton(
-            child: const Text("Exit"),
-            onPressed: () => context.pop(),
-          ))
+                child: const Text("Exit"),
+                onPressed: () => context.pop(),
+              )),
+          endReached
+              ? Positioned(
+                  bottom: 30,
+                  right: 30,
+                  child: FadeInRight(
+                    from: 15,
+                    delay: const Duration(seconds: 1),
+                    child: FilledButton(
+                      child: const Text("Start"),
+                      onPressed: () {},
+                    ),
+                  ))
+              : const SizedBox()
         ],
       ),
     );
